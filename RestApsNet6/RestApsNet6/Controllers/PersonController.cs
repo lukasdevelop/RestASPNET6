@@ -4,17 +4,17 @@ namespace RestApsNet6.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CalculatorController : ControllerBase
+    public class PersonController : ControllerBase
     {
-        private readonly ILogger<CalculatorController> _logger;
+        private readonly ILogger<PersonController> _logger;
 
-        public CalculatorController(ILogger<CalculatorController> logger)
+        public PersonController(ILogger<PersonController> logger)
         {
             _logger = logger;
         }
 
         [HttpGet("sum/{firstNumber}/{secondNumber}")]
-        public IActionResult Get(string firstNumber, string secondNumber)
+        public IActionResult Sum(string firstNumber, string secondNumber)
         {
             if(isNumeric(firstNumber) && isNumeric(secondNumber))
             {
@@ -24,6 +24,7 @@ namespace RestApsNet6.Controllers
             return BadRequest("Invalid input");
         }
 
+        
         private decimal ConvertToDecimal(string strNumber)
         {
             decimal decimalValue;
