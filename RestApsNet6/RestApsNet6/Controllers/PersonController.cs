@@ -1,47 +1,60 @@
 using Microsoft.AspNetCore.Mvc;
+using RestApsNet6.Model;
+using RestApsNet6.Services.Implementations;
 
 namespace RestApsNet6.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PersonController : ControllerBase
     {
         private readonly ILogger<PersonController> _logger;
+        private IPersonService _personService;
 
-        public PersonController(ILogger<PersonController> logger)
+        public PersonController(ILogger<PersonController> logger, IPersonService personService)
         {
             _logger = logger;
+            _personService = personService;
         }
 
-        [HttpGet("sum/{firstNumber}/{secondNumber}")]
-        public IActionResult Sum(string firstNumber, string secondNumber)
+        [HttpGet]
+        public IActionResult Get()
         {
-            if(isNumeric(firstNumber) && isNumeric(secondNumber))
-            {
-                var sum = ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber);
-                return Ok(sum.ToString());
-            }
-            return BadRequest("Invalid input");
+            return Ok(_personService.FindAll());
         }
 
-        
-        private decimal ConvertToDecimal(string strNumber)
+        [HttpGet("{id}")]
+        public IActionResult Get(long id)
         {
-            decimal decimalValue;
+            var person = _personService.FindByID(id);
 
-            if(decimal.TryParse(strNumber, out decimalValue))
-            {
-                return decimalValue;
-            }
-            return 0;
+            if(person == null) return NotFound();
+
+            return Ok(person);
         }
 
-        private bool isNumeric(string strNumber)
+        [HttpPost]
+        public IActionResult Post([FromBody] Person person)
         {
-            double number;
-            bool isNumber = double.TryParse(strNumber, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out number);
-            return isNumber;
+            if (person == null) return BadRequest();
+
+            return Ok(_personService.Create(person));
         }
 
+        [HttpPut]
+        public IActionResult Put([FromBody] Person person)
+        {
+            if (person == null) return BadRequest();
+
+            return Ok(_personService.Update(person));
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(long id)
+        {
+            _personService.Delete(id);
+
+            return NoContent();
+        }
     }        
 }
